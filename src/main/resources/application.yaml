@@ -11,14 +11,30 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://localhost:8761/eureka/
   instance:
     hostname: localhost
 
 # Zuul properties
 zuul:
+  prefix: /api
   host:
     socket-timeout-millis: 30000
   routes:
-    product-service: /product-service/**
-    inventory-service: /inventory-service/**
+    product-service:
+      path: /products/**
+      service-id: product-service
+      strip-prefix: false
+    inventory-service:
+      path: /inventory/**
+      service-id: inventory-service
+      strip-prefix: false
+  ratelimit:
+    enabled: true
+    policy-list:
+      product-service:
+        - limit: 10
+        - refresh-interval: 60
+      inventory-service:
+        - limit: 10
+        - refresh-interval: 60
